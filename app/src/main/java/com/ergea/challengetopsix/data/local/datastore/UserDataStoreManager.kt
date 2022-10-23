@@ -22,6 +22,10 @@ class UserDataStoreManager(@ApplicationContext val context: Context) {
         it[ID_USER_KEY] ?: 0
     }
 
+    val getUserImageProfile : Flow<String> = context.dataStore.data.map {
+        it[PROFILE_IMAGE_KEY] ?: ""
+    }
+
     suspend fun saveUsername(username : String){
         context.dataStore.edit {
             it[USERNAME_KEY] = username
@@ -31,6 +35,12 @@ class UserDataStoreManager(@ApplicationContext val context: Context) {
     suspend fun saveIsLoginStatus(paramIsLogin : Boolean){
         context.dataStore.edit {
             it[IS_LOGIN_KEY] = paramIsLogin
+        }
+    }
+
+    suspend fun saveProfileImage(uri: String) {
+        context.dataStore.edit { preferences ->
+            preferences[PROFILE_IMAGE_KEY] = uri
         }
     }
 
@@ -58,11 +68,18 @@ class UserDataStoreManager(@ApplicationContext val context: Context) {
         }
     }
 
+    suspend fun removeImage(){
+        context.dataStore.edit {
+            it.remove(PROFILE_IMAGE_KEY)
+        }
+    }
+
     companion object {
         private const val DATASTORE_NAME = "user_preferences"
         private val USERNAME_KEY = stringPreferencesKey("username_key")
         private val ID_USER_KEY = intPreferencesKey("id_user_key")
         private val IS_LOGIN_KEY = booleanPreferencesKey("is_login_key")
+        private val PROFILE_IMAGE_KEY = stringPreferencesKey("profile_image_key")
         private val Context.dataStore by preferencesDataStore(
             name = DATASTORE_NAME
         )
